@@ -3,22 +3,19 @@
 security:
     # http://symfony.com/doc/current/book/security.html#encoding-the-user-s-password
     encoders:
-        Symfony\Component\Security\Core\User\User:
+        Acme\UserBundle\Entity\User:
             algorithm: bcrypt
-            cost:      15
 
     # http://symfony.com/doc/current/book/security.html#hierarchical-roles
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
-        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
     providers:
-        in_memory:
-            memory:
-                users:
-                    user:  { password: userpass, roles: [ 'ROLE_USER' ] }
-                    admin: { password: adminpass, roles: [ 'ROLE_ADMIN' ] }
+        user_db:
+            entity: { class: CWUserBundle:User, property: username }
+
+
 
     # the main part of the security, where you can set up firewalls
     # for specific sections of your app
@@ -41,10 +38,9 @@ security:
             form_login:
               check_path: /login_check
               login_path: /login
-              use_referer: false
-              csrf_parameter: _csrf_token
-              intention:      authenticate
-              csrf_provider:  form.csrf_provider
+              #scsrf_parameter: _csrf_token
+              #intention:      authenticate
+              #csrf_provider:  form.csrf_provider
             logout:
                 path:   /logout
                 target: /

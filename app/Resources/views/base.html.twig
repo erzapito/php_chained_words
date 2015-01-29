@@ -3,11 +3,46 @@
     <head>
         <meta charset="UTF-8" />
         <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+        {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
+    
+        <div class="container">
+        <nav class="navbar navbar-default">
+         <div class="container-fluid">
+           <!-- Brand and toggle get grouped for better mobile display -->
+           <div class="navbar-header">
+             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+               <span class="sr-only">{{ 'Toggle navigation' | trans }}</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+             </button>
+             <a class="navbar-brand" href="{{ path('homepage') }}">{{ 'Brand' | trans }}</a>
+           </div>
+
+           <!-- Collect the nav links, forms, and other content for toggling -->
+           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+             {% if not is_granted('ROLE_USER') %}
+             <li class="{% if app.request.attributes.get('_route') == 'login' %}active{% endif %}"><a href="{{ path('login') }}">{{ 'Log in' | trans }}</a></li>
+             {% endif %}
+             {% if is_granted('ROLE_USER') %}
+             <li><a href="{{ path('logout')}}">{{ 'Logout' | trans}}</a></li>
+             {% endif %}
+            </ul>
+          </div><!-- /.navbar-collapse -->
+         </div><!-- /.container-fluid -->
+        </nav>
+    
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        </div>
+        {% block javascripts %}
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        {% endblock %}
     </body>
 </html>
