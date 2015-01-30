@@ -22,6 +22,9 @@ class GameControllerTest extends WebTestCase
         ->get('doctrine')
         ->getManager()
         ;
+
+        $this->em->createQuery('DELETE AppBundle:Game')->execute();
+        $this->em->createQuery('DELETE AppBundle:GameWord')->execute();
     }
 
     public function testCreateGame_not_logged() {
@@ -31,8 +34,6 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testCreateGame_logged() {
-        $this->em->createQuery('DELETE AppBundle:Game')->execute();
-
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -57,6 +58,14 @@ class GameControllerTest extends WebTestCase
 
     public function testPlay_logged() {
         $client = static::createClient();
+
+        $crawler = $client->request('POST', '/games/create', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
         $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
             'PHP_AUTH_USER' => 'user',
             'PHP_AUTH_PW'   => 'userpass',
@@ -87,23 +96,110 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_no_game() {
-        $this->fail('not implemented');
+        $client = static::createClient();
+        $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
     }
 
     public function testPlay_not_valid_word(){
-        $this->fail('not implemented');
+        $client = static::createClient();
+
+        $crawler = $client->request('POST', '/games/create', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('{"winned":false,"last_word":"lea"}', $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=straw', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(452, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
     }
 
-    public function testPlay_user_word(){
-        $this->fail('not implemented');
+    public function testPlay_used_word(){
+        $client = static::createClient();
+
+        $crawler = $client->request('POST', '/games/create', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('{"winned":false,"last_word":"lea"}', $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=lea', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(451, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
     }
 
     public function testPlay_word_not_exists(){
-        $this->fail('not implemented');
+        $client = static::createClient();
+
+        $crawler = $client->request('POST', '/games/create', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('{"winned":false,"last_word":"lea"}', $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=earoooooo', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(453, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
     }
 
     public function testPlay_oponent_without_word(){
-        $this->fail('not implemented');
+                $client = static::createClient();
+
+        $crawler = $client->request('POST', '/games/create', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=8675309', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('{"winned":true}', $client->getResponse()->getContent());
     }
 
 }

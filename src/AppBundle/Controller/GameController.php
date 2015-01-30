@@ -60,7 +60,7 @@ class GameController extends Controller
 
         $usedWords = array();
         foreach ($usedWordsDB as $uwDB) {
-            $usedWords[] = $uwDB->word;
+            $usedWords[] = $uwDB->getWord();
         }
 
         // check word not used
