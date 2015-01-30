@@ -29,7 +29,7 @@ class Game
     /**
      * @ORM\Column(type="integer")
      */
-    private $numWords;
+    private $numWords = 0;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
