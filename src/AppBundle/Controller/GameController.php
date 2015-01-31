@@ -11,6 +11,8 @@ use AppBundle\Entity\GameWord;
 class GameController extends Controller
 {
 
+    const MAX_LAST_WORDS = 10;
+
     /**
      * @Route("/games", name="games_index")
      */
@@ -38,6 +40,48 @@ class GameController extends Controller
         $em->flush();
 
         $response = new Response();
+        return $response;
+    }
+
+    /**
+     * @Route("/games/current", name="current_game")
+     */
+    public function currentGameAction(){
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $em = $this->getDoctrine()->getManager();
+
+        // get current game
+        $game = $em->getRepository('AppBundle:Game')->findOneBy(array(
+            'endDate' => null,
+            'user' => $user->getUsername(),
+        ));
+
+        if (!isset($game)) {
+            $response = new Response();
+            $response->setStatusCode(404,'No active game');
+            return $response;
+        }
+
+        $lastWords = array();
+        $usedWordsDB = $em->getRepository('AppBundle:GameWord')->findBy(array(
+            'gameId' => $game->getId(),
+        ), array(
+            'id' => 'DESC',
+        ));
+        foreach ($usedWordsDB as $usedWordDB) {
+            $lastWords[] = $usedWordDB->getWord();
+            if (count($lastWords) >= self::MAX_LAST_WORDS) {
+                break;
+            }
+        }
+
+        $result = array(
+            'total_words' => $game->getNumWords(),
+            'last_words' => $lastWords,
+        );
+
+        $response = new Response();
+        $response->setContent(json_encode($result));
         return $response;
     }
 

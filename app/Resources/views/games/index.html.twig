@@ -1,11 +1,17 @@
 {# app/Resources/views/security/login.html.twig #}
 {% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/game_control.js') }}"></script>
+{% endblock %}
+
 {% block body %}
 
 <div class="row">
 
   <div class="col-md-8">
-    <h2>{{ 'Game' | trans }}</h2>
+    <h2>{{ 'Game' | trans }} <span id="total_words"></span></h2>
     
     <div id="current_game" style="display: none;">
       <input type="text" id="next_word" />
@@ -34,5 +40,6 @@
   </div>
   
 </div>
+
 
 {% endblock %}

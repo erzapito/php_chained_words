@@ -202,4 +202,45 @@ class GameControllerTest extends WebTestCase
         $this->assertEquals('{"winned":true}', $client->getResponse()->getContent());
     }
 
+    public function testCurrent_not_logged(){
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/games/current', array(), array(), array());
+        $this->assertTrue($client->getResponse()->isRedirect('http://localhost/login'));
+    }
+
+    public function testCurrent_no_game(){
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/games/current', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+        $this->assertEquals(404, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+    }
+
+    public function testCurrent_info() {
+        $client = static::createClient();
+
+        $crawler = $client->request('POST', '/games/create', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
+        $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+
+        $crawler = $client->request('GET', '/games/current', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('{"total_words":2,"last_words":["lea","apple"]}', $client->getResponse()->getContent());
+    }
+
 }
