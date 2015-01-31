@@ -17,7 +17,7 @@ class GameController extends Controller
      * @Route("/games", name="games_index")
      */
     public function indexAction() {
-        return $this->render('games/index.html.twig');
+        return $this->render('AppBundle::games/index.html.twig');
     }
 
     /**
@@ -39,7 +39,13 @@ class GameController extends Controller
         $em->persist($game);
         $em->flush();
 
+        $result = array(
+            'total_words' => 0,
+            'last_words' => array(),
+        );
+
         $response = new Response();
+        $response->setContent(json_encode($result));
         return $response;
     }
 
