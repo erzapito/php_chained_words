@@ -1,0 +1,38 @@
+{# app/Resources/views/security/login.html.twig #}
+{% extends 'base.html.twig' %}
+{% block body %}
+
+<div class="row">
+
+  <div class="col-md-8">
+    <h2>{{ 'Game' | trans }}</h2>
+    
+    <div id="current_game" style="display: none;">
+      <input type="text" id="next_word" />
+      <button id="send_next_word">{{ 'Send next word' | trans }}</button>
+
+      <h4>{{ 'Last used words' | trans }}</h4>
+      <ul id="last_words">
+      </ul>
+    </div>
+    
+    <button id="new_game">{{ 'New game' | trans }}</button>
+    
+  </div>
+  
+  <div class="col-md-4">
+    <h2>{{ 'Best Players' | trans }}</h2>
+    <table class="table table-striped" id="best_players">
+      <thead>
+        <th>{{ 'Name' | trans }}</th>
+        <th>{{ 'Num. Words' | trans }}</th>
+        <th>{{ 'Last Word' | trans }}</th>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  
+</div>
+
+{% endblock %}

@@ -10,6 +10,14 @@ use AppBundle\Entity\GameWord;
 
 class GameController extends Controller
 {
+
+    /**
+     * @Route("/games", name="games_index")
+     */
+    public function indexAction() {
+        return $this->render('games/index.html.twig');
+    }
+
     /**
      * @Route("/games/create", name="create_game")
      */
