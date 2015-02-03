@@ -12,6 +12,7 @@ class GameController extends Controller
 {
 
     const MAX_LAST_WORDS = 10;
+    const MAX_BEST_GAMES_RESULT = 5;
 
     /**
      * @Route("/games", name="games_index")
@@ -101,6 +102,33 @@ class GameController extends Controller
         return $response;
     }
 
+    /**
+     * @Route("/games/best", name="best_games")
+     */
+    public function bestGamesAction(){
+    	$result = array();
+    	$em = $this->getDoctrine()->getManager();
+    	$q = $em->getRepository('AppBundle:Game')->createQueryBuilder('q')
+    		->where('q.endDate IS NOT NULL')
+    		->orderBy('q.numWords','DESC')
+    		->setMaxResults(self::MAX_BEST_GAMES_RESULT)
+    		->getQuery();
+    	$games = $q->getResult();
+        
+    	
+    	foreach($games as $game){
+    		$result[] = array(
+    				'user' => $game->getUser(),
+    				'last_word' => $game->getLastWord(),
+    				'total_words' => $game->getNumWords(),
+    		);
+    	}
+    	
+    	$response = new Response();
+    	$response->setContent(json_encode($result));
+    	return $response;
+    }
+    
     /**
      * @Route("/games/play", name="play_game")
      */

@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Acme\UserBundle\Entity\User;
+use AppBundle\Entity\Game;
 
 class GameControllerTest extends WebTestCase
 {
@@ -252,6 +253,90 @@ class GameControllerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
         $this->assertEquals('{"total_words":2,"last_words":["lea","apple"]}', $client->getResponse()->getContent());
+    }
+
+    public function testBestUsers_no_users() {
+    	$this->createTestUser();
+    	$client = static::createClient();
+    	
+    	$crawler = $client->request('GET', '/games/best', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('[]', $client->getResponse()->getContent());
+    }
+    
+    public function testBestUsers_more_than_five() {
+    	$this->createTestUser();
+    	
+    	// dummy games
+    	$game = new Game();
+    	$game->setUser('A0');
+    	$game->setLastWord('A0');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(12);
+    	$this->em->persist($game);
+    	
+    	$game = new Game();
+    	$game->setUser('A1');
+    	$game->setLastWord('W1');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(10);
+    	$game->setEndDate(new \DateTime());
+    	$this->em->persist($game);
+    	
+    	$game = new Game();
+    	$game->setUser('A2');
+    	$game->setLastWord('W2');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(9);
+    	$game->setEndDate(new \DateTime());
+    	$this->em->persist($game);
+    	
+    	$game = new Game();
+    	$game->setUser('A3');
+    	$game->setLastWord('W3');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(8);
+    	$game->setEndDate(new \DateTime());
+    	$this->em->persist($game);
+    	
+    	$game = new Game();
+    	$game->setUser('A4');
+    	$game->setLastWord('W4');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(7);
+    	$game->setEndDate(new \DateTime());
+    	$this->em->persist($game);
+    	
+    	$game = new Game();
+    	$game->setUser('A5');
+    	$game->setLastWord('W5');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(6);
+    	$game->setEndDate(new \DateTime());
+    	$this->em->persist($game);
+    	
+    	$game = new Game();
+    	$game->setUser('A6');
+    	$game->setLastWord('W6');
+    	$game->setCreationDate(new \DateTime());
+    	$game->setNumWords(5);
+    	$game->setEndDate(new \DateTime());
+    	$this->em->persist($game);
+    	$this->em->flush();
+    	
+    	$client = static::createClient();
+    	
+    	$crawler = $client->request('GET', '/games/best', array(), array(), array(
+            'PHP_AUTH_USER' => 'user',
+            'PHP_AUTH_PW'   => 'userpass',
+        ));
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
+        $this->assertEquals('[{"user":"A1","last_word":"W1","total_words":10},{"user":"A2","last_word":"W2","total_words":9},{"user":"A3","last_word":"W3","total_words":8},{"user":"A4","last_word":"W4","total_words":7},{"user":"A5","last_word":"W5","total_words":6}]', $client->getResponse()->getContent());
     }
     
     private function createTestUser() {
