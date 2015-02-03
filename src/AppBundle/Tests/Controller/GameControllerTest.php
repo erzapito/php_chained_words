@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Acme\UserBundle\Entity\User;
 
 class GameControllerTest extends WebTestCase
 {
@@ -25,6 +26,7 @@ class GameControllerTest extends WebTestCase
 
         $this->em->createQuery('DELETE AppBundle:Game')->execute();
         $this->em->createQuery('DELETE AppBundle:GameWord')->execute();
+        $this->em->createQuery('DELETE CWUserBundle:User')->execute();
     }
 
     public function testCreateGame_not_logged() {
@@ -34,6 +36,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testCreateGame_logged() {
+    	$this->createTestUser();
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -57,6 +60,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_logged() {
+    	$this->createTestUser();
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -96,6 +100,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_no_game() {
+    	$this->createTestUser();
         $client = static::createClient();
         $crawler = $client->request('POST', '/games/play?word=apple', array(), array(), array(
             'PHP_AUTH_USER' => 'user',
@@ -106,6 +111,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_not_valid_word(){
+    	$this->createTestUser();
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -132,6 +138,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_used_word(){
+    	$this->createTestUser();
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -158,6 +165,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_word_not_exists(){
+    	$this->createTestUser();
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -184,6 +192,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testPlay_oponent_without_word(){
+    	$this->createTestUser();
                 $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -209,6 +218,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testCurrent_no_game(){
+    	$this->createTestUser();
         $client = static::createClient();
         $crawler = $client->request('GET', '/games/current', array(), array(), array(
             'PHP_AUTH_USER' => 'user',
@@ -218,6 +228,7 @@ class GameControllerTest extends WebTestCase
     }
 
     public function testCurrent_info() {
+    	$this->createTestUser();
         $client = static::createClient();
 
         $crawler = $client->request('POST', '/games/create', array(), array(), array(
@@ -241,6 +252,16 @@ class GameControllerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), $client->getResponse()->getContent());
         $this->assertEquals('{"total_words":2,"last_words":["lea","apple"]}', $client->getResponse()->getContent());
+    }
+    
+    private function createTestUser() {
+    	$encoder = static::$kernel->getContainer()->get('security.password_encoder');
+    	$user = new User();
+    	$user->setUsername('user');
+    	$user->setEmail('ee');
+    	$user->setPassword($encoder->encodePassword($user, 'userpass'));
+    	$this->em->persist($user);
+    	$this->em->flush();
     }
 
 }

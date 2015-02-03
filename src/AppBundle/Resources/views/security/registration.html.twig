@@ -1,0 +1,41 @@
+{# app/Resources/views/security/registration.html.twig #}
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+
+<div id="messages">
+{% if errors %}
+	<div class="alert alert-danger" role="alert">
+	<ul>
+	{% for error in errors %}
+	<li>{{ error | trans }}</li>
+    {% endfor %}
+    </ul>
+    </div>
+{% endif %}
+</div>
+
+<form action="{{ path('registration') }}" method="post" id="registration_form">
+ <div class="form-group">
+    <label for="username">{{'Username:' | trans }}</label>
+    <input class="form-control" type="text" id="username" name="username" value="{{ username }}" />
+ </div>
+ <div class="form-group">
+    <label for="password">{{ 'Password:' | trans }}</label>
+    <input class="form-control" type="password" id="password" name="password" />
+ </div>
+ <div class="form-group">
+    <label for="password">{{ 'Repeat Password:' | trans }}</label>
+    <input class="form-control" type="password" id="repeat_password" name="repeat_password" />
+ </div>
+ <div class="form-group">
+    <label for="password">{{ 'Email:' | trans }}</label>
+    <input class="form-control" type="password" id="email_password" name="email" />
+ </div>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+
+    <button>{{ 'Register' | trans }}</button>
+</form>
+
+{% endblock %}

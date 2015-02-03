@@ -37,6 +37,12 @@
              {% if not is_granted('ROLE_USER') %}
              <li class="{% if app.request.attributes.get('_route') == 'login' %}active{% endif %}"><a href="{{ path('login') }}">{{ 'Log in' | trans }}</a></li>
              {% endif %}
+
+             {% if not is_granted('ROLE_USER') %}
+             <li class="{% if app.request.attributes.get('_route') == 'registration' %}active{% endif %}"><a href="{{ path('registration') }}">{{ 'Registration' | trans }}</a></li>
+             {% endif %}
+
+
              {% if is_granted('ROLE_USER') %}
              <li><a href="{{ path('logout')}}">{{ 'Logout' | trans}}</a></li>
              {% endif %}

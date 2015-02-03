@@ -1,7 +1,7 @@
 imports:
     - { resource: parameters-tests.yml }
     - { resource: config.yml }
-    - { resource: security-tests.yml }
+    - { resource: security.yml }
 
 framework:
     test: ~
