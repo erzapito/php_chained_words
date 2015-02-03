@@ -28,12 +28,17 @@
                <span class="icon-bar"></span>
                <span class="icon-bar"></span>
              </button>
-             <a class="navbar-brand" href="{{ path('homepage') }}">{{ 'Brand' | trans }}</a>
+             <a class="navbar-brand" href="{{ path('homepage') }}">{{ 'Chained words' | trans }}</a>
            </div>
 
            <!-- Collect the nav links, forms, and other content for toggling -->
            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+            
+             {% if is_granted('ROLE_USER') %}
+             <li class="{% if app.request.attributes.get('_route') == 'games' %}active{% endif %}"><a href="{{ path('games') }}">{{ 'Games' | trans }}</a></li>
+             {% endif %}
+            
              {% if not is_granted('ROLE_USER') %}
              <li class="{% if app.request.attributes.get('_route') == 'login' %}active{% endif %}"><a href="{{ path('login') }}">{{ 'Log in' | trans }}</a></li>
              {% endif %}
