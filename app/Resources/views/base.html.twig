@@ -36,7 +36,7 @@
             <ul class="nav navbar-nav">
             
              {% if is_granted('ROLE_USER') %}
-             <li class="{% if app.request.attributes.get('_route') == 'games' %}active{% endif %}"><a href="{{ path('games') }}">{{ 'Games' | trans }}</a></li>
+             <li class="{% if app.request.attributes.get('_route') == 'games' %}active{% endif %}"><a href="{{ path('games_index') }}">{{ 'Games' | trans }}</a></li>
              {% endif %}
             
              {% if not is_granted('ROLE_USER') %}
