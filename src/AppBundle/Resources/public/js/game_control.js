@@ -1,9 +1,36 @@
 $(document).ready(function(){
 	checkCurrentGame();
+	getBestGames();
 	
 	$('#new_game').click(newGame);
 	$('#send_next_word').unbind('click').click(sendNextWord);
 });
+
+function getBestGames(){
+	var baseurl = window.URLS.baseurl;
+	
+	$.ajax({
+		'method': 'GET',
+		'url': baseurl + '/games/best',
+		'dataType':'json',
+		'success' : function(data) {
+			showBestGames(data);
+		}
+	})
+}
+
+function showBestGames(data) {
+	var bP = $('#best_players tbody');
+	bP.html('');
+	for (var i = 0; i < data.length; i++) {
+		var game = data[i];
+		var row = $('<tr/>');
+		row.append( $('<td/>').append(game.user) );
+		row.append( $('<td/>').append(game.total_words) );
+		row.append( $('<td/>').append(game.last_word) );
+		bP.append(row);
+	}
+}
 
 function checkCurrentGame(){
 	var baseurl = window.URLS.baseurl;
