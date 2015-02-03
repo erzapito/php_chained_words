@@ -98,7 +98,7 @@ class SecurityController extends Controller
     	$em->persist($u);
     	$em->flush();
     	
-    	return $this->redirect('/login');
+    	return $this->redirect(path('/login'));
     }
     
     private function validate ($username, $password, $repeatPassword, $email) {
