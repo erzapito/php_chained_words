@@ -2,6 +2,7 @@ $(document).ready(function(){
 	checkCurrentGame();
 	
 	$('#new_game').click(newGame);
+	$('#send_next_word').unbind('click').click(sendNextWord);
 });
 
 function checkCurrentGame(){
@@ -17,6 +18,52 @@ function checkCurrentGame(){
 	})
 }
 
+function addNewWords(w1,w2) {
+	console.log(w1);
+	console.log(w2);
+	
+	var i1 = $('<li/>').append(w1).hide();
+	i1.prependTo('#last_words').fadeIn('slow', function(){
+		var i2 = $('<li/>').append(w2).hide();	
+		i2.prependTo('#last_words').fadeIn('slow');
+	});
+}
+
+function sendNextWord() {
+	var baseurl = window.URLS.baseurl;
+	
+	var word = $('#next_word').val();
+	
+	var loading = $('#loading');
+	loading.show();
+	
+	$.ajax({
+		'method': 'POST',
+		'url': baseurl + '/games/play?word='+word,
+		'dataType':'json',
+		'success' : function(playData) {
+			if (playData.winned) {
+				alert('you winned');
+				resetGame();
+			} else {
+				addNewWords(word,playData.last_word);
+			}
+		},
+		'error' : function(info, errorStatus, errorThrown) {
+			alert('You lost');
+			resetGame();
+		},
+		'complete': function() {
+			loading.hide();
+		}
+	})
+}
+
+function resetGame() {
+	$('#total_words').text('');
+	$('#current_game').hide();
+}
+
 function loadGameData(gameData) {
 	$('#total_words').text(gameData.total_words);
 	
@@ -25,9 +72,9 @@ function loadGameData(gameData) {
 	
 	
 	for (var i = 0; i < gameData.last_words.length; i++) {
-		var elements = gameData.last_words[i];
+		var element = gameData.last_words[i];
 		var e = $('<li/>').append(element);
-		lostWordsList.append(e);
+		lastWordsList.append(e);
 	};
 	
 	$('#current_game').show();

@@ -25,8 +25,19 @@ class GameController extends Controller
      */
     public function createAction()
     {
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+    	$em = $this->getDoctrine()->getManager();
+    	
+        $user = $this->getUser();
 
+        // set all previous as finished
+        $games = $em->getRepository('AppBundle:Game')->findAll(array(
+            'endDate' => null,
+            'user' => $user->getUsername(),
+        ));
+        foreach ($games as $game) {
+        	$game->setEndDate(new \DateTime());
+        }
+        
         $game = new Game();
         $game->setNumWords(0);
         $game->setLastWord('');
@@ -34,14 +45,13 @@ class GameController extends Controller
         $game->setCreationDate(new \DateTime());
         $game->setWinned(false);
 
-        $em = $this->getDoctrine()->getManager();
-
         $em->persist($game);
         $em->flush();
 
         $result = array(
             'total_words' => 0,
             'last_words' => array(),
+        		'user'=> $user->getUsername(),
         );
 
         $response = new Response();
@@ -97,7 +107,7 @@ class GameController extends Controller
     public function playAction(){
         $request = $this->getRequest();
         $response = new Response();
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
 
         $word = $request->query->get('word');
@@ -145,7 +155,7 @@ class GameController extends Controller
 
         // check word exists (and get new word)
         $wordEnd = substr($word,-2);
-        $dict = file_get_contents('dict.txt');
+        $dict = file_get_contents($this->get('kernel')->getRootDir().'/../dict.txt');
         $dictWords = explode("\n", $dict);
 
         $found = false;
